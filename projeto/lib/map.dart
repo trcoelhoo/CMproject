@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-
+import 'package:geocoding_platform_interface/geocoding_platform_interface.dart';
+import 'package:geocoding/geocoding.dart';
 
 
 class Map extends StatefulWidget {
@@ -14,6 +15,7 @@ class Map extends StatefulWidget {
 }
 
 class _MapState extends State<Map> {
+  
   var markers=[];
   late BitmapDescriptor mapMarker;
   late GoogleMapController mapController;
@@ -30,8 +32,9 @@ class _MapState extends State<Map> {
   @override
   void initState() {
     super.initState();
-    setMarker();
     getCurrentLocation();
+    setMarker();
+    
   }
 
   @override
@@ -51,28 +54,29 @@ class _MapState extends State<Map> {
               setState(() {
                 markers.first = markers.first.copyWith(
                   positionParam: LatLng(currentLatitude, currentLongitude),
+                
                 );
               });
             },
           ),
-          Expanded(
-            child: Container(
+          Container(
               color: Colors.black,
               margin: EdgeInsets.only(top: 50.0),
               padding: EdgeInsets.all(10.0),
               child:Text(
-                '$currentLatitude, $currentLongitude',
+                '$currentAddress',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20.0,
                 ),
               ),
               )
-            ),
-          
-          
         ],
       ),
+          
+          
+        
+      
     );
   }
 
@@ -85,7 +89,7 @@ class _MapState extends State<Map> {
     mapController.animateCamera(
       CameraUpdate.newCameraPosition(CameraPosition(
         target: LatLng(currentLatitude, currentLongitude),
-        zoom: 14.4746,
+        zoom: 18,
         tilt:50.0,
       )));
       Marker marker = Marker(
@@ -113,12 +117,26 @@ class _MapState extends State<Map> {
         currentPostion = position;
         currentLatitude = position.latitude;
         currentLongitude = position.longitude;
+        getAddress(currentPostion);
 
       });
     }).catchError((e){
       print(e);
     });
 
+
+  }
+
+  getAddress(position) async{
+    List<Placemark> p = await placemarkFromCoordinates(position.latitude, position.longitude);
+    
+    Placemark place = p[0];
+
+    setState(() {
+      currentAddress = "${place.locality}, ${place.postalCode}, ${place.country}";
+    });
+    
+    
 
   }
 }

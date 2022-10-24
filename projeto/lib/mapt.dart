@@ -1,5 +1,5 @@
 import  'package:flutter/material.dart';
-import 'package:projeto/map.dart';
+
 import 'package:projeto/blocs/bloc/geolocation_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -37,7 +37,7 @@ class Mapt extends StatelessWidget {
                     myLocationEnabled: true,
                     initialCameraPosition: CameraPosition(
                       target: LatLng(state.position.latitude, state.position.longitude),
-                      zoom: 15,
+                      zoom: 18,
                     ),
                   );
                     

@@ -45,6 +45,8 @@ dev_dependencies:
   geocoding: ^2.0.5
   flutter_bloc: ^7.3.0
   equatable: ^2.0.3
+  ionicons: ^0.2.1
+  persistent_bottom_nav_bar: ^5.0.2
 
 
   # The "flutter_lints" package below contains a set of recommended lints to

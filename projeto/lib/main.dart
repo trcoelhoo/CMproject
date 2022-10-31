@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:projeto/blocs/bloc/geolocation_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:projeto/group_lobby.dart';
 import 'package:projeto/mapt.dart';
 import 'package:projeto/repositories/geo/geolocation_rep.dart';
 import 'package:projeto/repositories/geo/base_geolocation_rep.dart';
@@ -22,10 +23,13 @@ void main() {
   runApp(ChangeNotifierProvider(
     create: (context) => GroupState(),
     child: MyApp(),
+
   ));
+  
 }
 
 class MyApp extends StatelessWidget {
+  
   const MyApp({super.key});
   
   // This widget is the root of your application.
@@ -35,6 +39,7 @@ class MyApp extends StatelessWidget {
       providers: [
         RepositoryProvider<GeolocationRep>(
           create: (context) => GeolocationRep(),
+          
         ),
       ],
       child: MultiBlocProvider(
@@ -59,6 +64,9 @@ class MyApp extends StatelessWidget {
           '/group': (context) => Group(),
           '/group_create': (context) => GroupCreate(),
           '/group_join': (context) => GroupJoin(),
+          '/lobby': (context) => GroupLobby(),
+          
+          
           
           
           },
@@ -66,8 +74,11 @@ class MyApp extends StatelessWidget {
         
         
       ),
+      
     );
+    
   }
+  
 }
 
 class GroupState with ChangeNotifier {
@@ -82,6 +93,7 @@ class GroupState with ChangeNotifier {
   //For client
   bool isClientInitialized = false;
   late JsonRpc2Client client;
+  
 
   void addSelf(String name) {
     selfPlayer = Player(name: name, id: "This device", isHost: true, isSelf: true);
@@ -96,6 +108,7 @@ class GroupState with ChangeNotifier {
 
   void initializeServer() {
     if(!isServerInitialized) {
+      
       server = Server();
       controller = StreamController<StreamChannel<String>>();
       incomingconnections = controller.stream;
@@ -125,6 +138,15 @@ class GroupState with ChangeNotifier {
   void connectWithServer(String id ) {
     StreamChannel<String> channel = StreamChannel(NearbyStream(id).stream, NearbyStream(id).sink);
     client = JsonRpc2Client(null, channel);
+  }
+
+  void clearGroup() {
+    for (var player in players) {
+      if(!player.isSelf) {
+        players.remove(player);
+      }
+    }
+    notifyListeners();
   }
 }
 

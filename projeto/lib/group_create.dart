@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:projeto/group.dart';
+import 'package:projeto/group_lobby.dart';
 import 'package:projeto/repositories/group/base_group_rep.dart';
 import 'package:projeto/repositories/group/group_rep.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +27,10 @@ class GroupCreate extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.arrow_forward),
                 onPressed: (){
-                  Navigator.pushNamed(context, '/lobby');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => GroupLobby()),
+                  );
                 }
               )
             ],

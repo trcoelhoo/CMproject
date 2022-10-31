@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:projeto/blocs/bloc/geolocation_bloc.dart';
@@ -7,14 +9,25 @@ import 'package:projeto/repositories/geo/geolocation_rep.dart';
 import 'package:projeto/repositories/geo/base_geolocation_rep.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:projeto/save_night.dart';
+import 'package:provider/provider.dart';
+import 'package:pub_sub/pub_sub.dart';
+import 'package:stream_channel/stream_channel.dart';
+import 'package:pub_sub/json_rpc_2.dart';
+import 'package:projeto/NearbyClasses.dart';
+import 'package:projeto/group_create.dart';
+import 'package:projeto/group.dart';
+import 'package:projeto/group_join.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => GroupState(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
+  
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -32,100 +45,93 @@ class MyApp extends StatelessWidget {
               ..add(LoadGeoLocation()),
           ),
           
+          
         ],
         child: MaterialApp(
           title: 'SaveNight',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home:  SaveNight(),
+          initialRoute: '/',
+          routes: {
+          '/': (context) => SaveNight(),
+          '/map': (context) => Mapt(),
+          '/group': (context) => Group(),
+          '/group_create': (context) => GroupCreate(),
+          '/group_join': (context) => GroupJoin(),
+          
+          
+          },
         ),
+        
+        
       ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class GroupState with ChangeNotifier {
+  List<Player> players = [];
+  late Player selfPlayer;
+  //For server
+  bool isServerInitialized = false;
+  late Server server;
+  late StreamController<StreamChannel<String>> controller;
+  late Stream<StreamChannel<String>> incomingconnections;
+  late JsonRpc2Adapter adapter;
+  //For client
+  bool isClientInitialized = false;
+  late JsonRpc2Client client;
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+  void addSelf(String name) {
+    selfPlayer = Player(name: name, id: "This device", isHost: true, isSelf: true);
+    print("Self added|!1111!!!1!!!!!!!!!!!!!!!!");
+    players.add(selfPlayer);
+    notifyListeners();
+  }
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+  void addPlayer(@required String name, @required String id,isHost) {
+    players.add(Player(name: name, id: id, isHost: isHost, isSelf: false));
+  }
 
-  final String title;
+  void initializeServer() {
+    if(!isServerInitialized) {
+      server = Server();
+      controller = StreamController<StreamChannel<String>>();
+      incomingconnections = controller.stream;
+      adapter = JsonRpc2Adapter(incomingconnections, isTrusted: true);
+      server= Server([adapter])
+      ..start();
+      connectWithSelf();
+      isServerInitialized = true;
+    }else{
+      
+    }
+  }
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  void connectWithClient(String id) {
+    StreamChannel<String> channel = StreamChannel(NearbyStream(id).stream, NearbyStream(id).sink);
+    controller.add(channel);
+  }
+
+  void connectWithSelf() {
+    LoopbackStream loopback = LoopbackStream();
+    StreamChannel<String> clientchannel = StreamChannel(loopback.clientStream, loopback.clientSink);
+    StreamChannel<String> serverchannel = StreamChannel(loopback.serverStream, loopback.serverSink);
+    client = JsonRpc2Client(null, clientchannel);
+    controller.add(serverchannel);
+  }
+
+  void connectWithServer(String id ) {
+    StreamChannel<String> channel = StreamChannel(NearbyStream(id).stream, NearbyStream(id).sink);
+    client = JsonRpc2Client(null, channel);
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
+class Player {
+  String name;
+  String id;
+  bool isHost;
+  bool isSelf;
+  Player({required this.name, required this.id, bool this.isHost=false, bool this.isSelf=false});
 }

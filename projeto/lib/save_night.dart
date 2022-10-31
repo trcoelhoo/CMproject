@@ -3,6 +3,7 @@ import 'package:projeto/mapt.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:projeto/group.dart';
 import "package:persistent_bottom_nav_bar/persistent_tab_view.dart";
+import 'package:projeto/group_create.dart';
 
 
 class SaveNight extends StatefulWidget {
@@ -15,7 +16,8 @@ class SaveNight extends StatefulWidget {
 class _SaveNightState extends State<SaveNight> {
   final List<Widget> tabs = [
     Mapt(),
-    const Group(),
+    Group(),
+
   ];
 
   @override
@@ -39,6 +41,7 @@ class _SaveNightState extends State<SaveNight> {
         screens: tabs,
         items: _navBarsItems(),
       ),
+      
     );
 
   }
@@ -61,6 +64,7 @@ class _SaveNightState extends State<SaveNight> {
         activeColorPrimary: Colors.black,
         inactiveColorPrimary: Colors.grey,
       ),
+
     ];
   }
   /*

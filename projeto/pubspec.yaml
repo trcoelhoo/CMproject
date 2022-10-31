@@ -47,6 +47,10 @@ dev_dependencies:
   equatable: ^2.0.3
   ionicons: ^0.2.1
   persistent_bottom_nav_bar: ^5.0.2
+  nearby_connections: ^3.2.0
+  provider: ^6.0.4
+  pub_sub: ^2.0.0
+  stream_channel: ^2.0.0
 
 
   # The "flutter_lints" package below contains a set of recommended lints to

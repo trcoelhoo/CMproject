@@ -22,6 +22,7 @@ class _DrunkTestState extends State<DrunkTest> {
   Timer timer = Timer(Duration(seconds: 2), () {});
   
   void init() {
+    DateTime startTime= new DateTime.now();
     int count=0;
     int time=0;
     _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
@@ -31,6 +32,7 @@ class _DrunkTestState extends State<DrunkTest> {
         _gyroscopeZvalue =  num.parse(event.z.toStringAsFixed(1)).toDouble();
       });
       });
+
       //start timer till user puts the circle in the center
       timer = Timer.periodic(Duration(seconds:1), (timer) { 
         time+=1;
@@ -38,8 +40,12 @@ class _DrunkTestState extends State<DrunkTest> {
           count+=1;
           //print("User is not drunk");
           //show dialog
-          if (count==3){
-            double drunk_percentage= (time/30)*100;
+          if (count==5){
+            DateTime endTime= new DateTime.now();
+            int difference= endTime.difference(startTime).inMicroseconds;
+            double seconds= difference/1000000-5;
+            print("difference: $seconds");
+            double drunk_percentage= (seconds*100/30);
             drunk_percentage= num.parse(drunk_percentage.toStringAsFixed(2)).toDouble();
             timer.cancel();
             _subscription!.cancel();
@@ -69,7 +75,7 @@ class _DrunkTestState extends State<DrunkTest> {
           count=0;
           //print("User is drunk");
           //show dialog
-          if (time==30){
+          if (time==40){
             double drunk_percentage= (time/30)*100;
             timer.cancel();
             _subscription!.cancel();
@@ -195,7 +201,7 @@ class _DrunkTestState extends State<DrunkTest> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text('DrunkTest:'),
-            Text('Keep the beer in the center of the screen for 3 seconds'),
+            Text('Keep the beer in the center of the screen for 5 seconds'),
             Text('Don\'t waist beer!'),
             // circle that moves with gyroscope
             Container(

@@ -66,3 +66,4 @@ this._outcontroller.stream.forEach((data) {
   Stream<String> get stream => _incontroller.stream;
   StreamSink<String> get sink => _outcontroller.sink;
 }
+

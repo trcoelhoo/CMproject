@@ -63,14 +63,13 @@ class GroupLobbyBody extends StatelessWidget {
       children: <Widget>[
         Builder(
             builder: (context) {
-              var greetingcatch = Provider.of<GroupState>(context).client.subscribe("messages");
-                        greetingcatch.then((sub) {
+              var message= Provider.of<GroupState>(context).client.subscribe("messages");
+                        message.then((sub) {
                           print("listening to sub");
               sub.listen((msg) {
-                        print('got a greeting');
-                        final snackBar = SnackBar(content: Text("Got a greeting! It says: $msg"),);
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        Provider.of<MessagesState>(context,listen: false).addMessage("Player",msg);
+                        
+                        Provider.of<MessagesState>(context,listen: false).addMessage(Provider.of<GroupState>(context).players[int.parse(Provider.of<GroupState>(context).client.clientId.toString())].name,msg);
+
                         });
                         });
               return Container();
@@ -172,6 +171,8 @@ class _messageInput extends StatelessWidget {
 }
 
 class _messagesList extends StatelessWidget {
+
+
   @override
   Widget build(BuildContext context) {
     return Expanded(

@@ -4,7 +4,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:projeto/group.dart';
 import "package:persistent_bottom_nav_bar/persistent_tab_view.dart";
 import 'package:projeto/group_create.dart';
-
+import 'package:projeto/drunktest.dart';
 
 class SaveNight extends StatefulWidget {
   const SaveNight({Key? key}) : super(key: key);
@@ -18,6 +18,7 @@ class _SaveNightState extends State<SaveNight> {
   final List<Widget> tabs = [
     Mapt(),
     Group(),
+    DrunkTest(),
 
   ];
 
@@ -62,6 +63,12 @@ class _SaveNightState extends State<SaveNight> {
       PersistentBottomNavBarItem(
         icon: const Icon(Ionicons.people_circle_outline),
         title: ("Group"),
+        activeColorPrimary: Colors.black,
+        inactiveColorPrimary: Colors.grey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(Ionicons.beer_outline),
+        title: ("Drunk Test"),
         activeColorPrimary: Colors.black,
         inactiveColorPrimary: Colors.grey,
       ),

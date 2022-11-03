@@ -6,6 +6,8 @@ import "package:persistent_bottom_nav_bar/persistent_tab_view.dart";
 import 'package:projeto/group_create.dart';
 import 'package:projeto/drunktest.dart';
 
+import 'package:projeto/camera.dart';
+
 class SaveNight extends StatefulWidget {
   const SaveNight({Key? key}) : super(key: key);
 
@@ -14,40 +16,36 @@ class SaveNight extends StatefulWidget {
 }
 
 class _SaveNightState extends State<SaveNight> {
-  
   final List<Widget> tabs = [
     Mapt(),
     Group(),
     DrunkTest(),
-
+    Camera(),
   ];
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center( child: const Text("Save Night",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+        title: Center(
+          child: const Text(
+            "Save Night",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-        ),
-
-        
-        backgroundColor: Colors.black,  
+        backgroundColor: Colors.black,
       ),
-            body: PersistentTabView(
+      body: PersistentTabView(
         context,
         screens: tabs,
         items: _navBarsItems(),
       ),
-      
     );
-
   }
-  
 
   final PageStorageBucket bucket = PageStorageBucket();
   int _selectedIndex = 0;
@@ -72,7 +70,12 @@ class _SaveNightState extends State<SaveNight> {
         activeColorPrimary: Colors.black,
         inactiveColorPrimary: Colors.grey,
       ),
-
+      PersistentBottomNavBarItem(
+        icon: const Icon(Ionicons.camera_outline),
+        title: ("Camera"),
+        activeColorPrimary: Colors.black,
+        inactiveColorPrimary: Colors.grey,
+      ),
     ];
   }
   /*
@@ -315,5 +318,3 @@ class _SaveNightState extends State<SaveNight> {
         }
         */
 }
-
-

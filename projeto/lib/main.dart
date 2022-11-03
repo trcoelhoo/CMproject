@@ -1,9 +1,8 @@
-
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
 import 'package:projeto/blocs/bloc/geolocation_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:projeto/group_lobby.dart';
@@ -24,52 +23,54 @@ import 'package:projeto/group_join.dart';
 import 'package:projeto/NearbyClasses.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:camera/camera.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
     create: (context) => GroupState(),
     child: MyApp(),
-
   ));
-  
 }
 
 class MyApp extends StatefulWidget with WidgetsBindingObserver {
-  
   const MyApp({super.key});
   @override
   _MyAppState createState() => _MyAppState();
 
-  
   // This widget is the root of your application.
 
 }
 
-class _MyAppState extends State<MyApp>  with WidgetsBindingObserver {
-  
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   bool _isConnected = false;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed || state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.resumed ||
+        state == AppLifecycleState.inactive) {
       _isConnected = true;
       print("LOCATION SENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       //get current location, latitude and longitude
 
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
       Uint8List bytes = Uint8List.fromList(position.toString().codeUnits);
       //print ("Bytes: $bytes");
 
       //print ("Position latitude: $position ");
       //send current location to group
-      for (var i = 0; i < Provider.of<GroupState>(context,listen: false).players.length; i++) { 
-        print("Sending to: ${Provider.of<GroupState>(context,listen: false).players[i].name}");
+      for (var i = 0;
+          i < Provider.of<GroupState>(context, listen: false).players.length;
+          i++) {
+        print(
+            "Sending to: ${Provider.of<GroupState>(context, listen: false).players[i].name}");
         //send current location to group
         //Nearby().sendBytesPayload(Provider.of<GroupState>(context,listen: false).players[i].id, bytes);
-        Provider.of<GroupState>(context,listen: false).client.publish(
-                  "location",
-                  Provider.of<GroupState>(context,listen: false).selfPlayer.name +" : " + position.toString());
-        
+        Provider.of<GroupState>(context, listen: false).client.publish(
+            "location",
+            Provider.of<GroupState>(context, listen: false).selfPlayer.name +
+                " : " +
+                position.toString());
       }
     } else {
       _isConnected = false;
@@ -89,77 +90,75 @@ class _MyAppState extends State<MyApp>  with WidgetsBindingObserver {
     super.dispose();
   }
 
-  void init(){
+  void init() {
     // on location received from other player save it in the list of locations
-    Builder(
-            builder: (context) {
-              var message= Provider.of<GroupState>(context).client.subscribe("location");
-                        message.then((sub) {
-                          print("listening to sub");
-              sub.listen((msg) {
-                String name= msg.split(":")[0];
-                String location= msg.split(":")[1];
-                double lat= double.parse(location.split(",")[0]);
-                double long= double.parse(location.split(",")[1]);
-                print("Received location from $name: $location");
-                for (var i = 0; i < Provider.of<GroupState>(context,listen: false).players.length; i++) { 
-                  if (Provider.of<GroupState>(context,listen: false).players[i].name==name){
-                    Provider.of<GroupState>(context,listen: false).players[i].position= LatLng(lat,long);
-                  }
-                }
-              }); 
-            }); 
-            return Container();
+    Builder(builder: (context) {
+      var message =
+          Provider.of<GroupState>(context).client.subscribe("location");
+      message.then((sub) {
+        print("listening to sub");
+        sub.listen((msg) {
+          String name = msg.split(":")[0];
+          String location = msg.split(":")[1];
+          double lat = double.parse(location.split(",")[0]);
+          double long = double.parse(location.split(",")[1]);
+          print("Received location from $name: $location");
+          for (var i = 0;
+              i <
+                  Provider.of<GroupState>(context, listen: false)
+                      .players
+                      .length;
+              i++) {
+            if (Provider.of<GroupState>(context, listen: false)
+                    .players[i]
+                    .name ==
+                name) {
+              Provider.of<GroupState>(context, listen: false)
+                  .players[i]
+                  .position = LatLng(lat, long);
             }
-            
-          );
+          }
+        });
+      });
+      return Container();
+    });
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<GeolocationRep>(
           create: (context) => GeolocationRep(),
-          
         ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => GeolocationBloc(
-              geolocationRep: context.read<GeolocationRep>())
-              ..add(LoadGeoLocation()),
+            create: (context) =>
+                GeolocationBloc(geolocationRep: context.read<GeolocationRep>())
+                  ..add(LoadGeoLocation()),
           ),
-          
-          
         ],
-        child: MaterialApp(
+        child: GetMaterialApp(
           title: 'SaveNight',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
           initialRoute: '/',
           routes: {
-          '/': (context) => SaveNight(),
-          '/map': (context) => Mapt(),
-          '/group': (context) => Group(),
-          '/group_create': (context) => GroupCreate(),
-          '/group_join': (context) => GroupJoin(),
-          '/lobby': (context) => GroupLobby(),
-          '/drunktest': (context) => DrunkTest(),
-
+            '/': (context) => SaveNight(),
+            '/map': (context) => Mapt(),
+            '/group': (context) => Group(),
+            '/group_create': (context) => GroupCreate(),
+            '/group_join': (context) => GroupJoin(),
+            '/lobby': (context) => GroupLobby(),
+            '/drunktest': (context) => DrunkTest(),
           },
         ),
-        
-        
       ),
-      
     );
-    
   }
-
-
 }
 
 class GroupState with ChangeNotifier {
@@ -174,56 +173,56 @@ class GroupState with ChangeNotifier {
   //For client
   bool isClientInitialized = false;
   late JsonRpc2Client client;
-  
 
   void addSelf(String name) {
-    selfPlayer = Player(name: name, id: "This device", isHost: true, isSelf: true);
+    selfPlayer =
+        Player(name: name, id: "This device", isHost: true, isSelf: true);
     print("Self added|!1111!!!1!!!!!!!!!!!!!!!!");
     players.add(selfPlayer);
     notifyListeners();
   }
 
-  void addPlayer(@required String name, @required String id,isHost) {
+  void addPlayer(@required String name, @required String id, isHost) {
     players.add(Player(name: name, id: id, isHost: isHost, isSelf: false));
   }
 
   void initializeServer() {
-    if(!isServerInitialized) {
-      
+    if (!isServerInitialized) {
       server = Server();
       controller = StreamController<StreamChannel<String>>();
       incomingconnections = controller.stream;
       adapter = JsonRpc2Adapter(incomingconnections, isTrusted: true);
-      server= Server([adapter])
-      ..start();
+      server = Server([adapter])..start();
       connectWithSelf();
       isServerInitialized = true;
-    }else{
-      
-    }
+    } else {}
   }
 
   void connectWithClient(String id) {
-    StreamChannel<String> channel = StreamChannel(NearbyStream(id).stream, NearbyStream(id).sink);
+    StreamChannel<String> channel =
+        StreamChannel(NearbyStream(id).stream, NearbyStream(id).sink);
     controller.add(channel);
   }
 
   void connectWithSelf() {
     LoopbackStream loopback = LoopbackStream();
-    StreamChannel<String> clientchannel = StreamChannel(loopback.clientStream, loopback.clientSink);
-    StreamChannel<String> serverchannel = StreamChannel(loopback.serverStream, loopback.serverSink);
+    StreamChannel<String> clientchannel =
+        StreamChannel(loopback.clientStream, loopback.clientSink);
+    StreamChannel<String> serverchannel =
+        StreamChannel(loopback.serverStream, loopback.serverSink);
     client = JsonRpc2Client(null, clientchannel);
     controller.add(serverchannel);
   }
 
-  void connectWithServer(String id ) {
-    StreamChannel<String> channel = StreamChannel(NearbyStream(id).stream, NearbyStream(id).sink);
+  void connectWithServer(String id) {
+    StreamChannel<String> channel =
+        StreamChannel(NearbyStream(id).stream, NearbyStream(id).sink);
     client = JsonRpc2Client(null, channel);
   }
 
   void clearGroup() {
     for (var player in players) {
-      if(!player.isSelf) {
+      if (!player.isSelf) {
         players.remove(player);
       }
     }
@@ -237,5 +236,9 @@ class Player {
   bool isHost;
   bool isSelf;
   LatLng? position;
-  Player({required this.name, required this.id, bool this.isHost=false, bool this.isSelf=false});
+  Player(
+      {required this.name,
+      required this.id,
+      bool this.isHost = false,
+      bool this.isSelf = false});
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projeto/account.dart';
 import 'package:projeto/mapt.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:projeto/group.dart';
@@ -21,6 +22,7 @@ class _SaveNightState extends State<SaveNight> {
     Group(),
     DrunkTest(),
     Camera(),
+    Account(),
   ];
 
   @override
@@ -73,6 +75,12 @@ class _SaveNightState extends State<SaveNight> {
       PersistentBottomNavBarItem(
         icon: const Icon(Ionicons.camera_outline),
         title: ("Camera"),
+        activeColorPrimary: Colors.black,
+        inactiveColorPrimary: Colors.grey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(Ionicons.apps_outline),
+        title: ("Account"),
         activeColorPrimary: Colors.black,
         inactiveColorPrimary: Colors.grey,
       ),

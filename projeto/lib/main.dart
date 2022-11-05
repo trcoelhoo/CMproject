@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:projeto/account.dart';
 import 'package:projeto/blocs/bloc/geolocation_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:projeto/group_lobby.dart';
@@ -11,6 +13,8 @@ import 'package:projeto/repositories/geo/geolocation_rep.dart';
 import 'package:projeto/repositories/geo/base_geolocation_rep.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:projeto/save_night.dart';
+import 'package:projeto/services/auth_service.dart';
+import 'package:projeto/widgets/auth_check.dart';
 import 'package:provider/provider.dart';
 import 'package:pub_sub/pub_sub.dart';
 import 'package:stream_channel/stream_channel.dart';
@@ -24,10 +28,17 @@ import 'package:projeto/NearbyClasses.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:camera/camera.dart';
+import 'package:projeto/services/auth_service.dart';
 
-void main() {
-  runApp(ChangeNotifierProvider(
-    create: (context) => GroupState(),
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => GroupState()),
+      ChangeNotifierProvider(create: (context) => AuthService()),
+    ],
     child: MyApp(),
   ));
 }
@@ -147,13 +158,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           ),
           initialRoute: '/',
           routes: {
-            '/': (context) => SaveNight(),
+            '/': (context) => AuthCheck(),
             '/map': (context) => Mapt(),
             '/group': (context) => Group(),
             '/group_create': (context) => GroupCreate(),
             '/group_join': (context) => GroupJoin(),
             '/lobby': (context) => GroupLobby(),
             '/drunktest': (context) => DrunkTest(),
+            '/Account': (context) => Account(),
           },
         ),
       ),

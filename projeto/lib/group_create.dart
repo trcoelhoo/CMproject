@@ -184,6 +184,10 @@ void connectionRequestPrompt(String id, ConnectionInfo info, BuildContext contex
                       },
                     );
                     Provider.of<GroupState>(context,listen: false).connectWithClient(id);
+                    Provider.of<GroupState>(context,listen: false).setHost(true);
+                    //add player to list
+                    
+
             }),
            ]
          )]),

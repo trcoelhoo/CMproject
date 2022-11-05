@@ -19,3 +19,9 @@ class GeolocationLoaded extends GeolocationState {
 
 class GeolocationError extends GeolocationState {}
 
+class UpdateLocation extends GeolocationEvent {
+  GeolocationState state=GeolocationLoading();
+  
+  @override
+  List<Object?> get props => [state];
+}

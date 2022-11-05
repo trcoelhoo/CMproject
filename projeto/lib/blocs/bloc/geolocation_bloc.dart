@@ -30,6 +30,26 @@ class GeolocationBloc extends Bloc<GeolocationEvent, GeolocationState> {
   Stream<GeolocationState> _mapLoadGeoLocationToState() async* {
     try {
       _geolocationSubscription?.cancel();
+      bool serviceEnabled;
+      LocationPermission permission;
+
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        Future.error('Location services are disabled');
+      }
+
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Future.error('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        Future.error(
+            'Location permissions are permanently denied, we cannot request permissions.');
+      }
       final position = await _geolocationRep.getCurrentPosition();
       add(UpdateGeoLocation(position: position));
     } catch (_) {

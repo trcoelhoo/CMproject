@@ -3,6 +3,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
 import 'package:projeto/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:projeto/main.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -46,6 +47,7 @@ class _LoginPageState extends State<LoginPage> {
   login() async {
     try {
       await context.read<AuthService>().login(email.text, password.text);
+      Provider.of<GroupState>(context, listen: false).addSelf(email.text);
     } on AuthException catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.message)));
@@ -55,6 +57,7 @@ class _LoginPageState extends State<LoginPage> {
   signup() async {
     try {
       await context.read<AuthService>().signup(email.text, password.text);
+      Provider.of<GroupState>(context, listen: false).addSelf(email.text);
     } on AuthException catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.message)));

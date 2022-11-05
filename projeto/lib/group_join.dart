@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:projeto/group.dart';
 import 'package:projeto/NearbyClasses.dart';
 import 'package:nearby_connections/nearby_connections.dart';
+import 'package:projeto/group_lobby.dart';
 import 'package:projeto/main.dart';
 import 'package:provider/provider.dart';
 //page where the user can connect to an existing group by nearby connection
@@ -35,11 +36,11 @@ class _hostSearchButton extends StatelessWidget {
       onPressed: () async {
         try {
         bool a = await Nearby().startDiscovery(
-        Provider.of<GroupState>(context).selfPlayer.name,
+        Provider.of<GroupState>(context,listen:false).selfPlayer.name,
         Strategy.P2P_STAR,
         onEndpointFound: (String id,String userName, String serviceId) {
           print("$id found with name $userName and $serviceId");
-          Provider.of<JoinsState>(context).addHost(id, userName, serviceId);
+          Provider.of<JoinsState>(context,listen: false).addHost(id, userName, serviceId);
 
         },
         onEndpointLost:
@@ -190,10 +191,9 @@ void connectionRequestPrompt(String id, ConnectionInfo info, BuildContext contex
                       print(exception);
                     }}),
             ElevatedButton(style: ElevatedButton.styleFrom(primary: Colors.green), child: Text("ACCEPT"), onPressed: () {
-              Provider.of<GroupState>(context).addPlayer(info.endpointName,id,false);
+              Provider.of<GroupState>(context,listen:false).addPlayer(info.endpointName,id,false);
                     Navigator.pop(context);
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, '/lobby', (_) => false);
+                    
                     Nearby().acceptConnection(
                       id,
                       onPayLoadRecieved: (endid, payload) {
@@ -204,7 +204,13 @@ void connectionRequestPrompt(String id, ConnectionInfo info, BuildContext contex
                         
                       },
                     );
-                    Provider.of<GroupState>(context).connectWithServer(id);
+                    Provider.of<GroupState>(context,listen: false).connectWithServer(id);
+                    Provider.of<GroupState>(context,listen: false).setHost(false);
+                    Provider.of<GroupState>(context,listen: false).players[1].isHost = true;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => GroupLobby()),
+                    );
             }),
            ]
          )]),

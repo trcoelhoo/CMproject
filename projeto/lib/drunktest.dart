@@ -76,7 +76,7 @@ class _DrunkTestState extends State<DrunkTest> {
           //print("User is drunk");
           //show dialog
           if (time==40){
-            double drunk_percentage= (time/30)*100;
+            double drunk_percentage= (time/40)*100;
             timer.cancel();
             _subscription!.cancel();
             _subscription = null;

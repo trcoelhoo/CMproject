@@ -6,15 +6,19 @@ import 'package:projeto/group_join.dart';
 import 'package:provider/provider.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import 'package:projeto/main.dart';
-
+import 'package:projeto/services/auth_service.dart';
 //page where the user can create a new group or connect to an existing group by nearby connection
 class Group extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    // see if selfPlayer is not been initialized
+    
+    
     return Scaffold(
         appBar: AppBar(
           title: Text("Select a Connection"),
+          automaticallyImplyLeading: false,
           backgroundColor: Colors.black26,
 
         ),
@@ -38,7 +42,7 @@ class GroupBody extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          Text("Hi, name! You can create a new group or join an existing one by nearby connection.",style: TextStyle(fontSize: 20),),
+          Text("Hi, ${Provider.of<GroupState>(context).selfPlayer.name}! You can create a new group or join an existing one by nearby connection.",style: TextStyle(fontSize: 20),),
           
           
           Container(
@@ -59,7 +63,7 @@ class GroupBody extends StatelessWidget {
                     color: Colors.white)),
                     
                 onPressed: () {
-                  Provider.of<GroupState>(context, listen: false).addSelf("name");
+                  
                   Nearby().askLocationPermission();
                   print("Offer pressed");
                   Provider.of<GroupState>(context, listen: false).selfPlayer.isHost=true;

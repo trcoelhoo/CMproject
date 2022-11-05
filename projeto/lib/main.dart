@@ -33,7 +33,7 @@ import 'package:projeto/services/auth_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
+  
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => GroupState()),
@@ -41,12 +41,16 @@ void main() async {
     ],
     child: MyApp(),
   ));
+  
 }
 
 class MyApp extends StatefulWidget with WidgetsBindingObserver {
   const MyApp({super.key});
+  
   @override
   _MyAppState createState() => _MyAppState();
+
+  
 
   // This widget is the root of your application.
 
@@ -54,7 +58,7 @@ class MyApp extends StatefulWidget with WidgetsBindingObserver {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   bool _isConnected = false;
-
+  
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed ||
@@ -91,6 +95,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    
     super.initState();
     WidgetsBinding.instance.addObserver(this);
   }
@@ -102,12 +107,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   void init() {
+    
     // on location received from other player save it in the list of locations
     Builder(builder: (context) {
       var message =
           Provider.of<GroupState>(context).client.subscribe("location");
       message.then((sub) {
-        print("listening to sub");
+        print("listening to sublocation");
         sub.listen((msg) {
           String name = msg.split(":")[0];
           String location = msg.split(":")[1];
@@ -137,6 +143,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    
+    Provider.of<GroupState>(context, listen: false).addSelf(Provider.of<AuthService>(context).utilizador!.email.toString());
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<GeolocationRep>(
@@ -225,6 +233,10 @@ class GroupState with ChangeNotifier {
     client = JsonRpc2Client(null, clientchannel);
     controller.add(serverchannel);
   }
+   void setHost(bool isHost) {
+    selfPlayer.isHost = isHost;
+    notifyListeners();
+   }
 
   void connectWithServer(String id) {
     StreamChannel<String> channel =

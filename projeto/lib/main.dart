@@ -144,9 +144,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     //see if user is logged in
-    if (Provider.of<AuthService>(context).isLoading){
+    if (Provider.of<AuthService>(context).isLogged()){
       Provider.of<GroupState>(context, listen: false).addSelf(Provider.of<AuthService>(context).utilizador!.email.toString());
     }
+    
 
     //Provider.of<GroupState>(context, listen: false).addSelf(Provider.of<AuthService>(context).utilizador!.email.toString());
     return MultiRepositoryProvider(

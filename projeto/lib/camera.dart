@@ -6,6 +6,7 @@ import 'package:camera_camera/camera_camera.dart';
 import 'package:get/get.dart';
 import 'package:projeto/preview_page.dart';
 import 'package:projeto/widgets/anexo.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Camera extends StatefulWidget {
   Camera({Key? key}) : super(key: key);
@@ -15,13 +16,22 @@ class Camera extends StatefulWidget {
 }
 
 class _CameraState extends State<Camera> {
-  File? library;
+  File? libr;
+  final picker = ImagePicker();
 
-  showPreview(file) async {
-    file = await Get.to(() => PreviewPage(file: file));
+  Future getFileFromGallery() async {
+    PickedFile? file = await picker.getImage(source: ImageSource.gallery);
 
     if (file != null) {
-      setState(() => library = file);
+      setState(() => libr = File(file.path));
+    }
+  }
+
+  showPreview(file) async {
+    File? arq = await Get.to(() => PreviewPage(file: file));
+
+    if (arq != null) {
+      setState(() => libr = arq);
       Get.back();
     }
   }
@@ -29,7 +39,12 @@ class _CameraState extends State<Camera> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text("Take pictures to remember!"),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.black26,
+      ),
+      backgroundColor: Colors.black12,
       body: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -38,7 +53,7 @@ class _CameraState extends State<Camera> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (library != null) Anexo(library: library!),
+                if (libr != null) Anexo(libr: libr!),
                 ElevatedButton.icon(
                   onPressed: () => Get.to(
                     () => CameraCamera(onFile: (file) => showPreview(file)),
@@ -46,13 +61,22 @@ class _CameraState extends State<Camera> {
                   icon: Icon(Icons.camera_alt),
                   label: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text('Tire uma foto'),
+                    child: Text('Take a picture'),
                   ),
                   style: ElevatedButton.styleFrom(
                       elevation: 0.0,
                       textStyle: TextStyle(
                         fontSize: 18,
                       )),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: Text('or'),
+                ),
+                OutlinedButton.icon(
+                  icon: Icon(Icons.attach_file),
+                  label: Text('Update a picture'),
+                  onPressed: () => getFileFromGallery(),
                 ),
               ],
             ),

@@ -1,3 +1,4 @@
+import 'package:projeto/main.dart';
 import 'package:projeto/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,14 @@ class _AccountState extends State<Account> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Hi, ${Provider.of<GroupState>(context).selfPlayer.name}!",
+          style: TextStyle(fontSize: 20),
+        ),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.black12,
+      ),
       body: Padding(
         padding: EdgeInsets.all(40),
         child: Column(

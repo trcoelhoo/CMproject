@@ -22,8 +22,9 @@ class _AccountState extends State<Account> {
           style: TextStyle(fontSize: 20),
         ),
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.black12,
+        backgroundColor: Colors.black26,
       ),
+      backgroundColor: Colors.black12,
       body: Padding(
         padding: EdgeInsets.all(40),
         child: Column(

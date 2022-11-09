@@ -16,7 +16,6 @@ class Account extends StatefulWidget {
 
 class _AccountState extends State<Account> {
   final FirebaseStorage storage = FirebaseStorage.instance;
-  // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   List<Reference> refs = [];
   List<String> arquivos = [];
   bool loading = true;
@@ -30,17 +29,12 @@ class _AccountState extends State<Account> {
   }
 
   loadImages() async {
-    // final SharedPreferences prefs = await _prefs;
-    // arquivos = prefs.getStringList('images') ?? [];
-
-    // if (arquivos.isEmpty) {
     refs = (await storage.ref('images').listAll()).items;
     for (var ref in refs) {
       final arquivo = await ref.getDownloadURL();
       arquivos.add(arquivo);
     }
-    // prefs.setStringList('images', arquivos);
-    // }
+
     setState(() => loading = false);
   }
 

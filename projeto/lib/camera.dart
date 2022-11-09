@@ -60,6 +60,7 @@ class _CameraState extends State<Camera> {
                     Get.to(() =>
                         CameraCamera(onFile: (file) => showPreview(file)));
                     requestCameraPermission();
+                    requestStoragePermission();
                   },
                   icon: Icon(Icons.camera_alt),
                   label: Padding(
@@ -93,6 +94,23 @@ class _CameraState extends State<Camera> {
 void requestCameraPermission() async {
   /// status can either be: granted, denied, restricted or permanentlyDenied
   var status = await Permission.camera.status;
+  if (status.isGranted) {
+    print("Permission is granted");
+  }
+  if (status.isDenied) {
+    if (await Permission.camera.request().isGranted) {
+      print("Permission was granted");
+    }
+  }
+
+  if (status.isPermanentlyDenied) {
+    openAppSettings();
+  }
+}
+
+void requestStoragePermission() async {
+  /// status can either be: granted, denied, restricted or permanentlyDenied
+  var status = await Permission.storage.status;
   if (status.isGranted) {
     print("Permission is granted");
   }

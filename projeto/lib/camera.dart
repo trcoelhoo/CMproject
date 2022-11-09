@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:camera_camera/camera_camera.dart';
 import 'package:get/get.dart';
@@ -11,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 class Camera extends StatefulWidget {
   Camera({Key? key}) : super(key: key);
+  final Future<FirebaseApp> _inicializacao = Firebase.initializeApp();
 
   @override
   _CameraState createState() => _CameraState();
@@ -18,21 +21,51 @@ class Camera extends StatefulWidget {
 
 class _CameraState extends State<Camera> {
   File? libr;
-  final picker = ImagePicker();
 
-  Future getFileFromGallery() async {
-    PickedFile? file = await picker.getImage(source: ImageSource.gallery);
+  final FirebaseStorage storage = FirebaseStorage.instance;
+  Future<XFile?> getImage() async {
+    final ImagePicker _picker = ImagePicker();
+    XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    return image;
+  }
 
-    if (file != null) {
-      setState(() => libr = File(file.path));
+  Future<UploadTask> upload(String path) async {
+    File file = File(path);
+    try {
+      String ref = 'images/img-${DateTime.now().toString()}.jpeg';
+      final storageRef = FirebaseStorage.instance.ref();
+      return storageRef.child(ref).putFile(
+            file,
+            SettableMetadata(
+              contentType: "image/jpeg",
+            ),
+          );
+    } on FirebaseException catch (e) {
+      throw Exception('Erro no upload: ${e.code}');
     }
   }
+
+  pickAndUploadImage() async {
+    XFile? file = await getImage();
+    if (file != null) {
+      await upload(file.path);
+    }
+  }
+
+  // Future getFileFromGallery() async {
+  //   PickedFile? file = await picker.getImage(source: ImageSource.gallery);
+
+  //   if (file != null) {
+  //     setState(() => libr = File(file.path));
+  //   }
+  // }
 
   showPreview(file) async {
     File? arq = await Get.to(() => PreviewPage(file: file));
 
     if (arq != null) {
       setState(() => libr = arq);
+      await upload(arq.path);
       Get.back();
     }
   }
@@ -57,9 +90,10 @@ class _CameraState extends State<Camera> {
                 if (libr != null) Anexo(libr: libr!),
                 ElevatedButton.icon(
                   onPressed: () {
+                    requestCameraPermission();
+                    requestStoragePermission();
                     Get.to(() =>
                         CameraCamera(onFile: (file) => showPreview(file)));
-                    requestCameraPermission();
                   },
                   icon: Icon(Icons.camera_alt),
                   label: Padding(
@@ -78,8 +112,8 @@ class _CameraState extends State<Camera> {
                 ),
                 OutlinedButton.icon(
                   icon: Icon(Icons.attach_file),
-                  label: Text('Update a picture'),
-                  onPressed: () => getFileFromGallery(),
+                  label: Text('Upload a picture'),
+                  onPressed: () => pickAndUploadImage(),
                 ),
               ],
             ),
@@ -93,6 +127,23 @@ class _CameraState extends State<Camera> {
 void requestCameraPermission() async {
   /// status can either be: granted, denied, restricted or permanentlyDenied
   var status = await Permission.camera.status;
+  if (status.isGranted) {
+    print("Permission is granted");
+  }
+  if (status.isDenied) {
+    if (await Permission.camera.request().isGranted) {
+      print("Permission was granted");
+    }
+  }
+
+  if (status.isPermanentlyDenied) {
+    openAppSettings();
+  }
+}
+
+void requestStoragePermission() async {
+  /// status can either be: granted, denied, restricted or permanentlyDenied
+  var status = await Permission.storage.status;
   if (status.isGranted) {
     print("Permission is granted");
   }

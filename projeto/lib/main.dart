@@ -33,7 +33,7 @@ import 'package:projeto/services/auth_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => GroupState()),
@@ -41,16 +41,13 @@ void main() async {
     ],
     child: MyApp(),
   ));
-  
 }
 
 class MyApp extends StatefulWidget with WidgetsBindingObserver {
   const MyApp({super.key});
-  
+
   @override
   _MyAppState createState() => _MyAppState();
-
-  
 
   // This widget is the root of your application.
 
@@ -58,13 +55,13 @@ class MyApp extends StatefulWidget with WidgetsBindingObserver {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   bool _isConnected = false;
-  
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed ||
         state == AppLifecycleState.inactive) {
       _isConnected = true;
-      
+
       //get current location, latitude and longitude
 
       
@@ -90,7 +87,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void initState() {
-    
     super.initState();
     WidgetsBinding.instance.addObserver(this);
   }
@@ -102,7 +98,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   void init() {
-    
     // on location received from other player save it in the list of locations
     Builder(builder: (context) {
       var mes =
@@ -158,10 +153,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     //see if user is logged in
-    if (Provider.of<AuthService>(context).isLogged()){
-      Provider.of<GroupState>(context, listen: false).addSelf(Provider.of<AuthService>(context).utilizador!.email.toString());
+    if (Provider.of<AuthService>(context).isLogged()) {
+      Provider.of<GroupState>(context, listen: false).addSelf(
+          Provider.of<AuthService>(context).utilizador!.email.toString());
     }
-    
 
     //Provider.of<GroupState>(context, listen: false).addSelf(Provider.of<AuthService>(context).utilizador!.email.toString());
     return MultiRepositoryProvider(
@@ -253,10 +248,11 @@ class GroupState with ChangeNotifier {
     client = JsonRpc2Client(null, clientchannel);
     controller.add(serverchannel);
   }
-   void setHost(bool isHost) {
+
+  void setHost(bool isHost) {
     selfPlayer.isHost = isHost;
     notifyListeners();
-   }
+  }
 
   void connectWithServer(String id) {
     StreamChannel<String> channel =

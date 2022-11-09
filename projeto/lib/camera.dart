@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:projeto/preview_page.dart';
 import 'package:projeto/widgets/anexo.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Camera extends StatefulWidget {
   Camera({Key? key}) : super(key: key);
@@ -55,9 +56,11 @@ class _CameraState extends State<Camera> {
               children: [
                 if (libr != null) Anexo(libr: libr!),
                 ElevatedButton.icon(
-                  onPressed: () => Get.to(
-                    () => CameraCamera(onFile: (file) => showPreview(file)),
-                  ),
+                  onPressed: () {
+                    Get.to(() =>
+                        CameraCamera(onFile: (file) => showPreview(file)));
+                    requestCameraPermission();
+                  },
                   icon: Icon(Icons.camera_alt),
                   label: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -84,5 +87,22 @@ class _CameraState extends State<Camera> {
         ),
       ),
     );
+  }
+}
+
+void requestCameraPermission() async {
+  /// status can either be: granted, denied, restricted or permanentlyDenied
+  var status = await Permission.camera.status;
+  if (status.isGranted) {
+    print("Permission is granted");
+  }
+  if (status.isDenied) {
+    if (await Permission.camera.request().isGranted) {
+      print("Permission was granted");
+    }
+  }
+
+  if (status.isPermanentlyDenied) {
+    openAppSettings();
   }
 }

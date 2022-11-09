@@ -6,7 +6,7 @@ import 'package:projeto/group_join.dart';
 import 'package:provider/provider.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import 'package:projeto/main.dart';
-import 'package:projeto/services/auth_service.dart';
+
 //page where the user can create a new group or connect to an existing group by nearby connection
 class Group extends StatelessWidget {
   @override
@@ -99,6 +99,8 @@ class GroupBody extends StatelessWidget {
                 onPressed: () {
                   Nearby().askLocationPermission();
                   print("Join pressed");
+                  Provider.of<GroupState>(context, listen: false).selfPlayer.isHost=false;
+                  
                    Navigator.push(
                     context,
                     MaterialPageRoute(

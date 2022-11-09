@@ -34,27 +34,35 @@ class _hostSearchButton extends StatelessWidget {
     return IconButton(
       icon: Icon(Icons.search),
       onPressed: () async {
-        try {
-        bool a = await Nearby().startDiscovery(
-        Provider.of<GroupState>(context,listen:false).selfPlayer.name,
-        Strategy.P2P_STAR,
-        onEndpointFound: (String id,String userName, String serviceId) {
-          print("$id found with name $userName and $serviceId");
-          Provider.of<JoinsState>(context,listen: false).addHost(id, userName, serviceId);
-
-        },
-        onEndpointLost:
-        (String? id) {
-          print("$id lost");
-          
-        },
-        );
         
+        try {
+        //request permissions
+          Nearby().askBluetoothPermission();
+          Nearby().askLocationAndExternalStoragePermission();
+
+          bool a = await Nearby().startDiscovery(
+          
+          Provider.of<GroupState>(context,listen:false).selfPlayer.name,
+          Strategy.P2P_STAR,
+          onEndpointFound: (String id,String userName, String serviceId) {
+            print("$id found with name $userName and $serviceId");
+            Provider.of<JoinsState>(context,listen: false).addHost(id, userName, serviceId);
+
+          },
+          onEndpointLost:
+          (String? id) {
+            print("$id lost");
+            
+          },
+          );
+          print("searching");
+          
         
         } catch (e) {
           print(e);
           Provider.of<JoinsState>(context,listen: false).searchingChange(false);
         }
+        print("searching");
         Provider.of<JoinsState>(context,listen: false).searchingChange(true);
       }
     );
@@ -69,6 +77,8 @@ class _hostSearchStopButton extends StatelessWidget {
       icon: Icon(Icons.cancel),
       onPressed: () async {
       await Nearby().stopDiscovery();
+      //disconnect from all hosts
+      Provider.of<JoinsState>(context,listen: false).disconnectAll();
       Provider.of<JoinsState>(context,listen: false).searchingChange(false);
     }
     );
@@ -87,6 +97,13 @@ void addHost (String id, String userName, String serviceId){
   if (HostList.every((element) => element.id != id)){
   HostList.add(Host(id, userName, serviceId));
   notifyListeners();} else {print("$userName $id already discovered");}
+}
+void disconnectAll(){
+  HostList.forEach((element) {
+    Nearby().disconnectFromEndpoint(element.id);
+  });
+  HostList = [];
+  notifyListeners();
 }
 }
 

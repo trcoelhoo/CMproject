@@ -1,7 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:projeto/group.dart';
 import 'package:projeto/NearbyClasses.dart';
+
+import 'package:projeto/group.dart';
+
+import 'package:projeto/group_join.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import 'package:projeto/main.dart';
 import 'package:provider/provider.dart';
@@ -13,52 +17,171 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 //page where the user can see his group and the other players in it and send messages to them
 
-class GroupLobby extends StatelessWidget {
+
+class GroupLobby extends StatefulWidget {
+  @override
+  _GroupLobbyState createState() => _GroupLobbyState();
+}
+
+class _GroupLobbyState extends State<GroupLobby> {
+
+ 
+
+  List<ChatMessage> messages = [];
+  final controller= TextEditingController();
+  void addMessgeToList(ChatMessage  obj){
+
+    setState(() {
+      messages.insert(0, obj);
+      messages=messages.reversed.toList();
+    });
+  }
+  
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+  }
+
+  void init(){
+    var message= Provider.of<GroupState>(context,listen: false).client.subscribe("messages");
+    message.then((sub) {
+      sub.listen((data) {
+        var obj = ChatMessage(messageContent: data["message"], sender: data["sender"]);
+
+        addMessgeToList(obj);
+    });
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MessagesState(),
-      child: Scaffold(
-          appBar: AppBar(
-            title: Text("Group Lobby"),
-            automaticallyImplyLeading: false,
-            backgroundColor: Colors.black26,
-            actions: <Widget>[
-              _leaveGroupButton(),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Group: ${Provider.of<GroupState>(context,listen:false).players.firstWhere((player) => player.isHost == true).name}'s Lobby"),
+        centerTitle: true,
+        backgroundColor: Colors.black26,
+        automaticallyImplyLeading: false,
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 17,
+          fontWeight: FontWeight.bold,
+        ),
+        leading: IconButton(
+                    icon: Icon(Icons.exit_to_app),
+                    onPressed: () async {
+                      try {
+                        await Nearby().stopAdvertising();
+                        await Nearby().stopDiscovery();
+                        await Nearby().stopAllEndpoints();
+
+                        Provider.of<GroupState>(context,listen: false).clearGroup();
+                        Navigator.pop(context);
+                        
+                        
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Group()),
+                        );
+                        dispose();
+                      } catch (e) {
+                        print(e);
+                      }
+                    },
+                  ),
+
+      ),
+      body: Column(
+        children: [
+          _playersList(),
+          Expanded(
+            child: ListView.builder(
+              itemCount: messages.length,
+              shrinkWrap: true,
+              padding: EdgeInsets.only(top: 10,bottom: 10),
+              itemBuilder: (context, index) {
+                return Container(
+                  padding: EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                  child: Align(
+                    alignment: (messages[index].sender==Provider.of<GroupState>(context,listen: false).selfPlayer.name)?Alignment.topRight:Alignment.topLeft,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: (messages[index].sender==Provider.of<GroupState>(context,listen: false).selfPlayer.name)?Colors.black26:Colors.grey.shade200,
+                      ),
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          
+                          Text(messages[index].messageContent,style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400),),
+                          SizedBox(height: 5,),
+                          Text(messages[index].sender,style: TextStyle(fontSize: 10,fontWeight: FontWeight.w300),),
+                          
+                        ],
+                      ),
+
+                    ),
+                  ),
+                );
+                
+              },
+            ),
           ),
-          body: GroupLobbyBody()),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    decoration: InputDecoration(
+                      hintText: "Type a message",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                FloatingActionButton(
+                  backgroundColor: Colors.black,
+                  onPressed: () {
+                    print("client ${Provider.of<GroupState>(context,listen: false).client.clientId}");
+                    var message= Provider.of<GroupState>(context,listen: false).client.publish("messages",{"message": controller.text, "sender": Provider.of<GroupState>(context,listen: false).selfPlayer.name});
+                    message.then((value) {
+                      var obj = ChatMessage(messageContent: controller.text, sender: Provider.of<GroupState>(context,listen: false).selfPlayer.name);
+                      addMessgeToList(obj);
+                      controller.clear();
+                    });
+                  },
+                  child: Icon(Icons.send),
+                ),
+              ],
+            ),
+          ),
+         
+        ],
+      ),
     );
   }
 }
 
-class _leaveGroupButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
 
-    return IconButton(
-      icon: Icon(Icons.exit_to_app),
-      onPressed: () async {
-        try {
-          await Nearby().stopAdvertising();
-          await Nearby().stopDiscovery();
-          await Nearby().stopAllEndpoints();
-          Provider.of<MessagesState>(context,listen: false).clearMessages();
-          Provider.of<GroupState>(context,listen: false).clearGroup();
-          Navigator.pop(context);
-          
-          
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Group()),
-          );
-        } catch (e) {
-          print(e);
-        }
-      },
-    );
-  }
-}
+
+
+
+
 
 class GroupLobbyBody extends StatefulWidget{
   @override
@@ -260,14 +383,21 @@ class _messagesList extends StatelessWidget {
 }
 
 class _playersList extends StatelessWidget {
+  List<Player> players = [];
+  List<Player> playersfix = [];
   @override
   Widget build(BuildContext context) {
+    //remove duplicates from players list
+    players = Provider.of<GroupState>(context, listen: false).players;
+    playersfix = players.toSet().toList();
+    
     return Expanded(
       child: ListView.builder(
-        itemCount: Provider.of<GroupState>(context,listen: false).players.length,
-        itemBuilder: (context, index) {
+        itemCount: playersfix.length,
+        itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            title: Text(Provider.of<GroupState>(context,listen: false).players[index].name),
+            title: Text(playersfix[index].name),
+            subtitle: Text(playersfix[index].id),
           );
         },
       ),
@@ -285,6 +415,12 @@ class _groupInfo extends StatelessWidget {
   }
 }
 
+class ChatMessage{
+  String messageContent;
+  String sender;
+  ChatMessage({ required this.messageContent,  required this.sender});
+}
+
 
 
 
@@ -297,16 +433,13 @@ class MessageForm extends StatefulWidget{
   @override
   _MessageFormState createState() => _MessageFormState();
 }
-
 class _MessageFormState extends State<MessageForm> {
   final myController = TextEditingController();
-
   @override
   void dispose(){
     myController.dispose();
     super.dispose();
     }
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -337,3 +470,4 @@ class _MessageFormState extends State<MessageForm> {
     );
   }
 }*/
+

@@ -1,16 +1,11 @@
-import 'dart:ffi';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:projeto/group.dart';
 import 'package:projeto/group_lobby.dart';
-import 'package:projeto/repositories/group/base_group_rep.dart';
-import 'package:projeto/repositories/group/group_rep.dart';
 import 'package:provider/provider.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import 'package:projeto/main.dart';
 import 'package:projeto/NearbyClasses.dart';
-import 'package:projeto/main.dart';
+import 'package:provider/provider.dart';
 
 class GroupCreate extends StatelessWidget {
   @override
@@ -89,6 +84,7 @@ class _stopButton extends StatelessWidget {
       icon: Icon(Icons.cancel),
       onPressed: () async {
       await Nearby().stopAdvertising();
+      
       Provider.of<GroupCreateState>(context,listen: false).searchingChange(false);
       print("not searching!!!!!!!!!!!!!!!!!!!!!!!!!!: ${Provider.of<GroupCreateState>(context,listen: false).isSearching}");
       }
@@ -183,6 +179,7 @@ void connectionRequestPrompt(String id, ConnectionInfo info, BuildContext contex
                         NearbyStream(endid).receive(bytes);   
                       },
                     );
+                    
                     Provider.of<GroupState>(context,listen: false).connectWithClient(id);
                     Provider.of<GroupState>(context,listen: false).setHost(true);
                     //add player to list

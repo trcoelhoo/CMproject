@@ -48,8 +48,8 @@ class _AccountState extends State<Account> {
         ),
         automaticallyImplyLeading: false,
         leading: IconButton(
-            icon: Icon(Icons.logout_rounded),
-            onPressed: () => context.read<AuthService>().logout),
+            icon: const Icon(Icons.logout_rounded),
+            onPressed: () => context.read<AuthService>().logout()),
         backgroundColor: Colors.black26,
       ),
       backgroundColor: Colors.black12,

@@ -61,23 +61,36 @@ class Mapt extends StatelessWidget {
                     
                     initialCameraPosition: CameraPosition(
                       target: LatLng(state.position.latitude, state.position.longitude),
-                      zoom: 18,
+                      zoom: 19,
                     ),
                    
                   );
                   
+                  
                     
             
-                } else {
+                } else if (state is UpdatedMarkers){
+                  //get markers from state
+                  final Set<Marker> markersn = state.markers;
+                  return GoogleMap(
+                    myLocationEnabled: true,
+                    markers: markersn,
+                    
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(state.position.latitude, state.position.longitude),
+                      zoom: 19,
+                    ),
+                   
+                  );
+                }
+                else {
                   return const Center(
-                    child: Text('Erro ao carregar o mapa'),
+                    child: Text('Something went wrong!'),
                   );
                 }
               },
-              
-            )
+            ),
           ),
-          
         ],
       ),
     );

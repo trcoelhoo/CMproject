@@ -2,6 +2,7 @@ part of 'geolocation_bloc.dart';
 
 abstract class GeolocationState extends Equatable
 {
+  
   const GeolocationState();
   @override
   List<Object?> get props => [];
@@ -19,6 +20,14 @@ class GeolocationLoaded extends GeolocationState {
 
 class GeolocationError extends GeolocationState {}
 
+class UpdatedMarkers extends GeolocationState {
+  final Position position;
+  final Set<Marker> markers;
+  UpdatedMarkers({required this.markers, required this.position});
+
+  @override
+  List<Object?> get props => [position,markers];
+}
 class UpdateLocation extends GeolocationEvent {
   GeolocationState state=GeolocationLoading();
   

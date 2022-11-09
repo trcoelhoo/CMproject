@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
@@ -22,7 +22,11 @@ class GeolocationBloc extends Bloc<GeolocationEvent, GeolocationState> {
   ) async* {
     if (event is LoadGeoLocation) {
       yield* _mapLoadGeoLocationToState();
-    } else if (event is UpdateGeoLocation) {
+    }
+    else if (event is NewMarkers) {
+      yield* _mapNewMarkersToState(event);
+    }
+    else if (event is UpdateGeoLocation) {
       yield* _mapUpdateGeoLocationToState(event);
     }
   }
@@ -51,15 +55,21 @@ class GeolocationBloc extends Bloc<GeolocationEvent, GeolocationState> {
             'Location permissions are permanently denied, we cannot request permissions.');
       }
       final position = await _geolocationRep.getCurrentPosition();
-      add(UpdateGeoLocation(position: position));
+
+      add(UpdateGeoLocation(position: position, markers: {}));
+      
     } catch (_) {
       yield GeolocationError();
     }
   }
 
+  Stream<GeolocationState> _mapNewMarkersToState(NewMarkers event) async* {
+   add(UpdateGeoLocation(position: await _geolocationRep.getCurrentPosition(), markers: event.markers));
+  }
   Stream<GeolocationState> _mapUpdateGeoLocationToState(
       UpdateGeoLocation event) async* {
-    yield GeolocationLoaded(position: event.position);
+    yield GeolocationLoaded(position: event.position );
+    yield UpdatedMarkers(position: event.position, markers: event.markers);
   }
 
   @override

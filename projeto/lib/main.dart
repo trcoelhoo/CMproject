@@ -67,29 +67,21 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       
       //get current location, latitude and longitude
 
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      Uint8List bytes = Uint8List.fromList(position.toString().codeUnits);
+      
       //print ("Bytes: $bytes");
 
       //print ("Position latitude: $position ");
       //send current location to group
-      for (var i = 0;
-          i < Provider.of<GroupState>(context, listen: false).players.length;
-          i++) {
-            if (Provider.of<GroupState>(context, listen: false).players[i].name != Provider.of<GroupState>(context, listen: false).selfPlayer.name){
-                print("LOCATION SENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                print(
-                    "Sending to: ${Provider.of<GroupState>(context, listen: false).players[i].name}");
-                //send current location to group
-                //Nearby().sendBytesPayload(Provider.of<GroupState>(context,listen: false).players[i].id, bytes);
-                Provider.of<GroupState>(context, listen: false).client.publish(
-                    "location",
-                    Provider.of<GroupState>(context, listen: false).selfPlayer.name +
-                        " : " +
-                        position.toString());
-            }
-      }
+      Position position = await Geolocator.getCurrentPosition(
+                      desiredAccuracy: LocationAccuracy.high);
+                      Provider.of<GroupState>(context,listen: false).client.publish(
+                          "location",
+                          Provider.of<GroupState>(context,listen: false).selfPlayer.name +
+                              ":" +
+                              position.latitude.toString() +
+                              "," +
+                              position.longitude.toString());
+                  
     } else {
       _isConnected = false;
       //print("Disconnected!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -113,16 +105,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     
     // on location received from other player save it in the list of locations
     Builder(builder: (context) {
-      var message =
-          Provider.of<GroupState>(context).client.subscribe("location");
-      message.then((sub) {
+      var mes =
+          Provider.of<GroupState>(context,listen: false).client.subscribe("location");
+      mes.then((sub) {
         print("listening to sublocation");
         sub.listen((msg) {
+          print(msg);
           String name = msg.split(":")[0];
-          String location = msg.split(":")[1];
-          double lat = double.parse(location.split(",")[0]);
-          double long = double.parse(location.split(",")[1]);
-          print("Received location from $name: $location");
+          String lat = msg.split(":")[1].split(",")[0];
+          String long = msg.split(":")[1].split(",")[1];
+
+          double lati = double.parse(lat);
+          double longi = double.parse(long);
           for (var i = 0;
               i <
                   Provider.of<GroupState>(context, listen: false)
@@ -135,8 +129,25 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 name) {
               Provider.of<GroupState>(context, listen: false)
                   .players[i]
-                  .position = LatLng(lat, long);
+                  .position = LatLng(lati, longi);
             }
+            //print locations of players
+            print("player name ${Provider.of<GroupState>(context, listen: false)
+                .players[i].name} e pos ${Provider.of<GroupState>(context, listen: false)
+                .players[i]
+                .position}");
+            Provider.of<GroupState>(context, listen: false).markers.add(
+              Marker(
+                markerId: MarkerId(Provider.of<GroupState>(context, listen: false)
+                    .players[i]
+                    .name),
+                position: LatLng(lati, longi),
+                infoWindow: InfoWindow(title: name),
+              ),
+            );
+            BlocProvider.of<GeolocationBloc>(context).add(
+                NewMarkers(markers: Provider.of<GroupState>(context, listen: false)
+                    .markers));
           }
         });
       });
@@ -201,6 +212,7 @@ class GroupState with ChangeNotifier {
   //For client
   bool isClientInitialized = false;
   late JsonRpc2Client client;
+  Set<Marker> markers = {};
 
   void addSelf(String name) {
     selfPlayer =

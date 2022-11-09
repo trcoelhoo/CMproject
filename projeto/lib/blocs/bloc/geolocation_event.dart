@@ -11,9 +11,19 @@ class LoadGeoLocation extends GeolocationEvent {
 
 }
 
+class NewMarkers extends GeolocationEvent {
+  final Set<Marker> markers;
+  NewMarkers({required this.markers});
+
+  @override
+  List<Object?> get props => [markers];
+}
+
 class UpdateGeoLocation extends GeolocationEvent {
   final Position position;
-  UpdateGeoLocation({required this.position});
+  final Set<Marker> markers;
+  UpdateGeoLocation({required this.position, required this.markers});
+
   @override
-  List<Object?> get props => [position];
+  List<Object?> get props => [position,markers];
 }

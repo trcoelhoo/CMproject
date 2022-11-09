@@ -224,6 +224,7 @@ void connectionRequestPrompt(String id, ConnectionInfo info, BuildContext contex
                     Provider.of<GroupState>(context,listen: false).connectWithServer(id);
                     Provider.of<GroupState>(context,listen: false).setHost(false);
                     Provider.of<GroupState>(context,listen: false).players[1].isHost = true;
+                    print("players in group: ${Provider.of<GroupState>(context,listen: false).players.length}");
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => GroupLobby()),

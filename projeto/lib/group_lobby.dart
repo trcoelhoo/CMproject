@@ -32,8 +32,8 @@ class _GroupLobbyState extends State<GroupLobby> {
   void addMessgeToList(ChatMessage  obj){
 
     setState(() {
-      messages.insert(0, obj);
-      messages=messages.reversed.toList();
+      messages.insert(messages.length, obj);
+      
     });
   }
   
@@ -57,8 +57,41 @@ class _GroupLobbyState extends State<GroupLobby> {
         var obj = ChatMessage(messageContent: data["message"], sender: data["sender"]);
 
         addMessgeToList(obj);
+        for (var i = 0;
+              i <
+                  Provider.of<GroupState>(context, listen: false)
+                      .players
+                      .length;
+              i++) {
+            if (Provider.of<GroupState>(context, listen: false)
+                    .players[i]
+                    .name ==
+                data["sender"]) {
+              Provider.of<GroupState>(context, listen: false)
+                  .players[i]
+                  .position = LatLng(data["lat"], data["long"]);
+            }
+            //print locations of players
+            print("player name ${Provider.of<GroupState>(context, listen: false)
+                .players[i].name} e pos ${Provider.of<GroupState>(context, listen: false)
+                .players[i]
+                .position}");
+            Provider.of<GroupState>(context, listen: false).markers.add(
+              Marker(
+                markerId: MarkerId(Provider.of<GroupState>(context, listen: false)
+                    .players[i]
+                    .name),
+                position: LatLng(data["lat"], data["long"]),
+                infoWindow: InfoWindow(title: data["sender"]),
+              ),
+            );
+        BlocProvider.of<GeolocationBloc>(context).add(
+                NewMarkers(markers: Provider.of<GroupState>(context, listen: false)
+                    .markers));
+          }
     });
     });
+    
 
   }
 
@@ -156,9 +189,11 @@ class _GroupLobbyState extends State<GroupLobby> {
                 ),
                 FloatingActionButton(
                   backgroundColor: Colors.black,
-                  onPressed: () {
+                  onPressed: () async {
                     print("client ${Provider.of<GroupState>(context,listen: false).client.clientId}");
-                    var message= Provider.of<GroupState>(context,listen: false).client.publish("messages",{"message": controller.text, "sender": Provider.of<GroupState>(context,listen: false).selfPlayer.name});
+                    Position position = await Geolocator.getCurrentPosition(
+                      desiredAccuracy: LocationAccuracy.high);
+                    var message= Provider.of<GroupState>(context,listen: false).client.publish("messages",{"message": controller.text, "sender": Provider.of<GroupState>(context,listen: false).selfPlayer.name, "lat": position.latitude, "long": position.longitude});
                     message.then((value) {
                       var obj = ChatMessage(messageContent: controller.text, sender: Provider.of<GroupState>(context,listen: false).selfPlayer.name);
                       addMessgeToList(obj);

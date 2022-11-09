@@ -31,6 +31,7 @@ class GroupBody extends StatelessWidget {
   @override
   
   Widget build(BuildContext context) {
+    print("players in group: ${Provider.of<GroupState>(context,listen:false).players.length}");
     return Container(
       color: Colors.black12,
       child:Padding(
@@ -41,6 +42,7 @@ class GroupBody extends StatelessWidget {
         
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        
         children: <Widget>[
           Text("Hi, ${Provider.of<GroupState>(context).selfPlayer.name}! You can create a new group or join an existing one by nearby connection.",style: TextStyle(fontSize: 20),),
           

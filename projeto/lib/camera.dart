@@ -89,10 +89,10 @@ class _CameraState extends State<Camera> {
                 if (libr != null) Anexo(libr: libr!),
                 ElevatedButton.icon(
                   onPressed: () {
-                    Get.to(() =>
-                        CameraCamera(onFile: (file) => showPreview(file)));
                     requestCameraPermission();
                     requestStoragePermission();
+                    Get.to(() =>
+                        CameraCamera(onFile: (file) => showPreview(file)));
                   },
                   icon: Icon(Icons.camera_alt),
                   label: Padding(

@@ -33,7 +33,7 @@ import 'package:projeto/services/auth_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => GroupState()),
@@ -41,16 +41,13 @@ void main() async {
     ],
     child: MyApp(),
   ));
-  
 }
 
 class MyApp extends StatefulWidget with WidgetsBindingObserver {
   const MyApp({super.key});
-  
+
   @override
   _MyAppState createState() => _MyAppState();
-
-  
 
   // This widget is the root of your application.
 
@@ -58,13 +55,13 @@ class MyApp extends StatefulWidget with WidgetsBindingObserver {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   bool _isConnected = false;
-  
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed ||
         state == AppLifecycleState.inactive) {
       _isConnected = true;
-      
+
       //get current location, latitude and longitude
 
       Position position = await Geolocator.getCurrentPosition(
@@ -77,18 +74,19 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       for (var i = 0;
           i < Provider.of<GroupState>(context, listen: false).players.length;
           i++) {
-            if (Provider.of<GroupState>(context, listen: false).players[i].name != Provider.of<GroupState>(context, listen: false).selfPlayer.name){
-                print("LOCATION SENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                print(
-                    "Sending to: ${Provider.of<GroupState>(context, listen: false).players[i].name}");
-                //send current location to group
-                //Nearby().sendBytesPayload(Provider.of<GroupState>(context,listen: false).players[i].id, bytes);
-                Provider.of<GroupState>(context, listen: false).client.publish(
-                    "location",
-                    Provider.of<GroupState>(context, listen: false).selfPlayer.name +
-                        " : " +
-                        position.toString());
-            }
+        if (Provider.of<GroupState>(context, listen: false).players[i].name !=
+            Provider.of<GroupState>(context, listen: false).selfPlayer.name) {
+          print("LOCATION SENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+          print(
+              "Sending to: ${Provider.of<GroupState>(context, listen: false).players[i].name}");
+          //send current location to group
+          //Nearby().sendBytesPayload(Provider.of<GroupState>(context,listen: false).players[i].id, bytes);
+          Provider.of<GroupState>(context, listen: false).client.publish(
+              "location",
+              Provider.of<GroupState>(context, listen: false).selfPlayer.name +
+                  " : " +
+                  position.toString());
+        }
       }
     } else {
       _isConnected = false;
@@ -98,7 +96,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void initState() {
-    
     super.initState();
     WidgetsBinding.instance.addObserver(this);
   }
@@ -110,7 +107,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   void init() {
-    
     // on location received from other player save it in the list of locations
     Builder(builder: (context) {
       var message =
@@ -147,10 +143,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     //see if user is logged in
-    if (Provider.of<AuthService>(context).isLogged()){
-      Provider.of<GroupState>(context, listen: false).addSelf(Provider.of<AuthService>(context).utilizador!.email.toString());
+    if (Provider.of<AuthService>(context).isLogged()) {
+      Provider.of<GroupState>(context, listen: false).addSelf(
+          Provider.of<AuthService>(context).utilizador!.email.toString());
     }
-    
 
     //Provider.of<GroupState>(context, listen: false).addSelf(Provider.of<AuthService>(context).utilizador!.email.toString());
     return MultiRepositoryProvider(
@@ -241,10 +237,11 @@ class GroupState with ChangeNotifier {
     client = JsonRpc2Client(null, clientchannel);
     controller.add(serverchannel);
   }
-   void setHost(bool isHost) {
+
+  void setHost(bool isHost) {
     selfPlayer.isHost = isHost;
     notifyListeners();
-   }
+  }
 
   void connectWithServer(String id) {
     StreamChannel<String> channel =

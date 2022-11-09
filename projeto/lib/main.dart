@@ -64,7 +64,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed ||
         state == AppLifecycleState.inactive) {
       _isConnected = true;
-      print("LOCATION SENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      
       //get current location, latitude and longitude
 
       Position position = await Geolocator.getCurrentPosition(
@@ -77,15 +77,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       for (var i = 0;
           i < Provider.of<GroupState>(context, listen: false).players.length;
           i++) {
-        print(
-            "Sending to: ${Provider.of<GroupState>(context, listen: false).players[i].name}");
-        //send current location to group
-        //Nearby().sendBytesPayload(Provider.of<GroupState>(context,listen: false).players[i].id, bytes);
-        Provider.of<GroupState>(context, listen: false).client.publish(
-            "location",
-            Provider.of<GroupState>(context, listen: false).selfPlayer.name +
-                " : " +
-                position.toString());
+            if (Provider.of<GroupState>(context, listen: false).players[i].name != Provider.of<GroupState>(context, listen: false).selfPlayer.name){
+                print("LOCATION SENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                print(
+                    "Sending to: ${Provider.of<GroupState>(context, listen: false).players[i].name}");
+                //send current location to group
+                //Nearby().sendBytesPayload(Provider.of<GroupState>(context,listen: false).players[i].id, bytes);
+                Provider.of<GroupState>(context, listen: false).client.publish(
+                    "location",
+                    Provider.of<GroupState>(context, listen: false).selfPlayer.name +
+                        " : " +
+                        position.toString());
+            }
       }
     } else {
       _isConnected = false;
@@ -214,7 +217,7 @@ class GroupState with ChangeNotifier {
   void initializeServer() {
     if (!isServerInitialized) {
       server = Server();
-      controller = StreamController<StreamChannel<String>>();
+      controller = StreamController<StreamChannel<String>>.broadcast();
       incomingconnections = controller.stream;
       adapter = JsonRpc2Adapter(incomingconnections, isTrusted: true);
       server = Server([adapter])..start();
@@ -250,11 +253,8 @@ class GroupState with ChangeNotifier {
   }
 
   void clearGroup() {
-    for (var player in players) {
-      if (!player.isSelf) {
-        players.remove(player);
-      }
-    }
+    players.clear();
+    players.add(selfPlayer);
     notifyListeners();
   }
 }

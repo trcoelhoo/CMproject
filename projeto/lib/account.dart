@@ -47,6 +47,9 @@ class _AccountState extends State<Account> {
           style: TextStyle(fontSize: 20),
         ),
         automaticallyImplyLeading: false,
+        leading: IconButton(
+            icon: Icon(Icons.logout_rounded),
+            onPressed: () => context.read<AuthService>().logout),
         backgroundColor: Colors.black26,
       ),
       backgroundColor: Colors.black12,

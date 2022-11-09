@@ -48,8 +48,8 @@ class _AccountState extends State<Account> {
         ),
         automaticallyImplyLeading: false,
         leading: IconButton(
-            icon: Icon(Icons.logout_rounded),
-            onPressed: () => context.read<AuthService>().logout),
+            icon: const Icon(Icons.logout_rounded),
+            onPressed: () => context.read<AuthService>().logout()),
         backgroundColor: Colors.black26,
       ),
       backgroundColor: Colors.black12,
@@ -76,35 +76,6 @@ class _AccountState extends State<Account> {
                       itemCount: arquivos.length,
                     ),
             ),
-      // body: Padding(
-      //   padding: EdgeInsets.all(40),
-      //   child: Column(
-      //     mainAxisAlignment: MainAxisAlignment.center,
-      //     children: [
-      //       Padding(
-      //         padding: EdgeInsets.symmetric(vertical: 24),
-      //         child: ElevatedButton(
-      //           onPressed: () => context.read<AuthService>().logout(),
-      //           style: ElevatedButton.styleFrom(
-      //             primary: Colors.red,
-      //           ),
-      //           child: Row(
-      //             mainAxisAlignment: MainAxisAlignment.center,
-      //             children: [
-      //               Padding(
-      //                 padding: EdgeInsets.all(16.0),
-      //                 child: Text(
-      //                   'LOGOUT',
-      //                   style: TextStyle(fontSize: 18),
-      //                 ),
-      //               ),
-      //             ],
-      //           ),
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
 }

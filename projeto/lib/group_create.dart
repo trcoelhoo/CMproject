@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import 'package:projeto/main.dart';
 import 'package:projeto/NearbyClasses.dart';
-import 'package:provider/provider.dart';
 
 class GroupCreate extends StatelessWidget {
   @override

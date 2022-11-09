@@ -2,10 +2,7 @@ import  'package:flutter/material.dart';
 
 import 'package:projeto/blocs/bloc/geolocation_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:projeto/NearbyClasses.dart';
-import 'package:nearby_connections/nearby_connections.dart';
 import 'package:projeto/main.dart';
 import 'package:provider/provider.dart';
 

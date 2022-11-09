@@ -108,64 +108,6 @@ class _DrunkTestState extends State<DrunkTest> {
       });
 
       
-      /*timer = Timer(Duration(seconds: 2), () {
-        //print("Timer ended");
-        //print("X: $_gyroscopeXvalue");
-        //print("Y: $_gyroscopeYvalue");
-        //print("Z: $_gyroscopeZvalue");
-        //if the user is drunk, the circle will move
-        if(_gyroscopeXvalue < 0.3 && _gyroscopeXvalue > -0.3 && _gyroscopeYvalue < 0.3 && _gyroscopeYvalue > -0.3 && _gyroscopeZvalue > 9.5 && _gyroscopeZvalue < 10.5){
-          
-          //print("User is not drunk");
-          //show dialog
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("You are not drunk!"),
-                content: Text("You can drive!"),
-                actions: [
-                  TextButton(
-                    child: Text("OK"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _subscription!.cancel();
-                      _subscription = null;
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
-        else{
-          //print("User is drunk");
-          //show dialog
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("You are drunk!"),
-                content: Text("You are not allowed to drive!"),
-                actions: [
-                  TextButton(
-                    child: Text("OK"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _subscription!.cancel();
-                      _subscription = null;
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
-      });
-      */
-
-
-    
   }
 
   @override

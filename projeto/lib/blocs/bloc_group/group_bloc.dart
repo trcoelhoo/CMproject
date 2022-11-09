@@ -3,8 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
-import 'package:pub_sub/pub_sub.dart' as pub_sub;
-import 'package:stream_channel/stream_channel.dart';
+
 
 import '../../main.dart';
 part 'group_event.dart';

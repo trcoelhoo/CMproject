@@ -1,6 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:projeto/group.dart';
 import 'package:projeto/NearbyClasses.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import 'package:projeto/group_lobby.dart';

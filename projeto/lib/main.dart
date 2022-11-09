@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:projeto/account.dart';
@@ -10,9 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:projeto/group_lobby.dart';
 import 'package:projeto/mapt.dart';
 import 'package:projeto/repositories/geo/geolocation_rep.dart';
-import 'package:projeto/repositories/geo/base_geolocation_rep.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:projeto/save_night.dart';
 import 'package:projeto/services/auth_service.dart';
 import 'package:projeto/widgets/auth_check.dart';
 import 'package:provider/provider.dart';
@@ -24,11 +21,7 @@ import 'package:projeto/group_create.dart';
 import 'package:projeto/group.dart';
 import 'package:projeto/drunktest.dart';
 import 'package:projeto/group_join.dart';
-import 'package:projeto/NearbyClasses.dart';
-import 'package:nearby_connections/nearby_connections.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:camera/camera.dart';
-import 'package:projeto/services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

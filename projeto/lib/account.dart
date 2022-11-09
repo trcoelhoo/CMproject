@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class Account extends StatefulWidget {
   Account({Key? key}) : super(key: key);
@@ -13,6 +15,35 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
+  final FirebaseStorage storage = FirebaseStorage.instance;
+  // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  List<Reference> refs = [];
+  List<String> arquivos = [];
+  bool loading = true;
+  bool uploading = false;
+  double total = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    loadImages();
+  }
+
+  loadImages() async {
+    // final SharedPreferences prefs = await _prefs;
+    // arquivos = prefs.getStringList('images') ?? [];
+
+    // if (arquivos.isEmpty) {
+    refs = (await storage.ref('images').listAll()).items;
+    for (var ref in refs) {
+      final arquivo = await ref.getDownloadURL();
+      arquivos.add(arquivo);
+    }
+    // prefs.setStringList('images', arquivos);
+    // }
+    setState(() => loading = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,35 +56,58 @@ class _AccountState extends State<Account> {
         backgroundColor: Colors.black26,
       ),
       backgroundColor: Colors.black12,
-      body: Padding(
-        padding: EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: ElevatedButton(
-                onPressed: () => context.read<AuthService>().logout(),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text(
-                        'LOGOUT',
-                        style: TextStyle(fontSize: 18),
-                      ),
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: arquivos.isEmpty
+                  ? const Center(child: Text('Não há imagens ainda.'))
+                  : ListView.builder(
+                      itemBuilder: (BuildContext context, index) {
+                        return ListTile(
+                          leading: SizedBox(
+                            width: 60,
+                            height: 40,
+                            child: Image.network(
+                              arquivos[index],
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          title: Text(refs[index].fullPath),
+                        );
+                      },
+                      itemCount: arquivos.length,
                     ),
-                  ],
-                ),
-              ),
             ),
-          ],
-        ),
-      ),
+      // body: Padding(
+      //   padding: EdgeInsets.all(40),
+      //   child: Column(
+      //     mainAxisAlignment: MainAxisAlignment.center,
+      //     children: [
+      //       Padding(
+      //         padding: EdgeInsets.symmetric(vertical: 24),
+      //         child: ElevatedButton(
+      //           onPressed: () => context.read<AuthService>().logout(),
+      //           style: ElevatedButton.styleFrom(
+      //             primary: Colors.red,
+      //           ),
+      //           child: Row(
+      //             mainAxisAlignment: MainAxisAlignment.center,
+      //             children: [
+      //               Padding(
+      //                 padding: EdgeInsets.all(16.0),
+      //                 child: Text(
+      //                   'LOGOUT',
+      //                   style: TextStyle(fontSize: 18),
+      //                 ),
+      //               ),
+      //             ],
+      //           ),
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }

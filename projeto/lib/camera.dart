@@ -65,7 +65,7 @@ class _CameraState extends State<Camera> {
 
     if (arq != null) {
       setState(() => libr = arq);
-      await upload(arq.path);
+      upload(arq.path);
       Get.back();
     }
   }

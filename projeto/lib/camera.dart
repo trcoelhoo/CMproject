@@ -36,6 +36,9 @@ class _CameraState extends State<Camera> {
       final storageRef = FirebaseStorage.instance.ref();
       return storageRef.child(ref).putFile(
             file,
+            SettableMetadata(
+              contentType: "image/jpeg",
+            ),
           );
     } on FirebaseException catch (e) {
       throw Exception('Erro no upload: ${e.code}');
@@ -108,7 +111,7 @@ class _CameraState extends State<Camera> {
                 ),
                 OutlinedButton.icon(
                   icon: Icon(Icons.attach_file),
-                  label: Text('Update a picture'),
+                  label: Text('Upload a picture'),
                   onPressed: () => pickAndUploadImage(),
                 ),
               ],
